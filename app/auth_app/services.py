@@ -50,17 +50,27 @@ class AuthService:
     def _generate_tokens(user) -> dict:
         access_payload = {
             "user_id": user.id,
-            "exp": datetime.now(UTC) + timedelta(minutes=15),
+            "exp": datetime.now(UTC) + timedelta(
+                minutes=settings.ACCESS_TOKEN_EXP_MINUTES),
             "type": "access",
         }
         refresh_payload = {
             "user_id": user.id,
-            "exp": datetime.now(UTC) + timedelta(days=7),
+            "exp": datetime.now(UTC) + timedelta(
+                minutes=settings.REFRESH_TOKEN_EXP_MINUTES),
             "type": "refresh",
         }
 
-        access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm="HS256")
-        refresh_token = jwt.encode(refresh_payload, settings.SECRET_KEY, algorithm="HS256")
+        access_token = jwt.encode(
+            access_payload,
+            settings.SECRET_KEY,
+            algorithm=settings.SIGN_TOKEN_ALGORITHM
+        )
+        refresh_token = jwt.encode(
+            refresh_payload,
+            settings.SECRET_KEY,
+            algorithm=settings.SIGN_TOKEN_ALGORITHM
+        )
 
         return {
             "access_token": access_token,

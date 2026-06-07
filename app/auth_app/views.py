@@ -5,25 +5,11 @@ from rest_framework import status
 from auth_app.models import RefreshToken
 from auth_app.serializers import UserSerializer, SignUpSerializer, LoginSerializer, ChangePasswordSerializer
 from auth_app.services import AuthService
-from auth_app.permissions import IsAuthenticated
+from auth_app.permissions import IsAuthenticated, RBACPermission
 
 
 class SignUpView(CreateAPIView):
     serializer_class = SignUpSerializer
-
-    def get(self, request):
-        return Response(
-            {
-                'message': 'Send a POST request with following fields to register a new user',
-                'fields': [
-                    'email',
-                    'password',
-                    'password_2',
-                    'first_name',
-                    'last_name'
-                ]
-            }, status=200
-        )
 
 
 class LoginView(APIView):
@@ -42,17 +28,6 @@ class LoginView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         return Response(tokens)
-    
-    def get(self, request):
-        return Response(
-            {
-                'message': 'Send a POST request with following fields to login',
-                'fields': [
-                    'email',
-                    'password'
-                ]
-            }, status=200
-        )
 
 
 class LogoutView(APIView):
@@ -64,7 +39,8 @@ class LogoutView(APIView):
 
 
 class PasswordChangeView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RBACPermission]
+    resource = ['user']
     
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
@@ -82,23 +58,12 @@ class PasswordChangeView(APIView):
         self.request.user.set_password(new_password)
 
         return Response(status=status.HTTP_201_CREATED)
-    
-    def get(self, request):
-        return Response(
-            {
-                'message': 'Send a Post request with following fields to change password',
-                'fields': [
-                    'old_password',
-                    'new_password',
-                    'new_password_2'
-                ]
-            }
-        )
 
 
 class ProfileView(RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, RBACPermission]
+    resourse = 'user'
     
     def get_object(self):
         return self.request.user

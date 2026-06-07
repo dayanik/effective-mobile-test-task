@@ -123,3 +123,7 @@ REST_FRAMEWORK = {
         "auth_app.authentication.CustomJWTAuthentication",
     ]
 }
+
+ACCESS_TOKEN_EXP_MINUTES = 30
+REFRESH_TOKEN_EXP_MINUTES = 7 * 24 * 60
+SIGN_TOKEN_ALGORITHM = "HS256"

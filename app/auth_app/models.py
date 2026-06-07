@@ -15,7 +15,6 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=128)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
-    roles = models.ManyToManyField('Role', through='UserRole')
     is_active = models.BooleanField(default=True)
 
     USERNAME_FIELD = 'email'
@@ -41,7 +40,6 @@ class Role(models.Model):
     Each role can have multiple permissions associated with it.
     '''
     name = models.CharField(max_length=50, unique=True)
-    permissions = models.ManyToManyField('Permission', through='RolePermission')
 
 
 class Resource(models.Model):
@@ -49,10 +47,15 @@ class Resource(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
 
+class Action(models.Model):
+    '''Model to represent user action on resource such as CRUD'''
+    name = models.CharField(max_length=50, unique=True)
+
+
 class Permission(models.Model):
     '''Model to represent permissions in the application.'''
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
-    action = models.CharField(max_length=50)
+    action = models.ForeignKey(Action, on_delete=models.CASCADE)
 
 
 class UserRole(models.Model):
