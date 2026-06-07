@@ -1,0 +1,15 @@
+[project]
+name = "effective-mobile-test-task"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "bcrypt>=5.0.0",
+    "django>=6.0.6",
+    "djangorestframework>=3.17.1",
+    "httpie>=3.2.4",
+    "psycopg2-binary>=2.9.12",
+    "pygments>=2.20.0",
+    "pyjwt>=2.13.0",
+]
