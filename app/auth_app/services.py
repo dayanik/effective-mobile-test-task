@@ -1,0 +1,72 @@
+from datetime import datetime, timedelta, UTC
+import jwt
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+
+from auth_app.models import RefreshToken, User
+
+
+class AuthService:
+    @staticmethod
+    def login(email: str, password: str) -> dict:
+        user = get_object_or_404(User, email=email)
+
+        if not user.is_active or not user or not user.check_password(password):
+            raise ValueError("Invalid credentials")
+
+        tokens = AuthService._generate_tokens(user)
+        AuthService._save_refresh_token(user, tokens["refresh_token"])
+
+        return tokens
+    
+    @staticmethod
+    def logout(user):
+        if isinstance(user, User):
+            token = RefreshToken.objects.filter(user=user)
+            if token:
+                token.delete()
+    
+    @staticmethod
+    def is_exist_refresh_token(user):
+        return RefreshToken.objects.filter(user=user)
+
+    @staticmethod
+    def validate_token(token):
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            if payload.get('type') == 'access':
+                if datetime.fromtimestamp(payload.get('exp'), UTC) < datetime.now(UTC):
+                    raise ValueError("Token has expired by time")
+                user = get_object_or_404(User, id=payload.get('user_id'))
+                if not user.is_active:
+                    raise ValueError("Invalid credentials")
+                return user
+        except jwt.ExpiredSignatureError:
+            raise ValueError("Token has expired")
+        except jwt.InvalidTokenError:
+            raise ValueError("Invalid token")
+
+    @staticmethod
+    def _generate_tokens(user) -> dict:
+        access_payload = {
+            "user_id": user.id,
+            "exp": datetime.now(UTC) + timedelta(minutes=15),
+            "type": "access",
+        }
+        refresh_payload = {
+            "user_id": user.id,
+            "exp": datetime.now(UTC) + timedelta(days=7),
+            "type": "refresh",
+        }
+
+        access_token = jwt.encode(access_payload, settings.SECRET_KEY, algorithm="HS256")
+        refresh_token = jwt.encode(refresh_payload, settings.SECRET_KEY, algorithm="HS256")
+
+        return {
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+        }
+
+    @staticmethod
+    def _save_refresh_token(user, token: str) -> None:
+        RefreshToken.objects.create(user=user, token=token)
