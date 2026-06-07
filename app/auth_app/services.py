@@ -1,5 +1,6 @@
-from datetime import datetime, timedelta, UTC
 import jwt
+from datetime import datetime, timedelta, UTC
+
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 

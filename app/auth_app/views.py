@@ -1,9 +1,17 @@
 from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    CreateAPIView,
+    RetrieveUpdateDestroyAPIView
+)
 from rest_framework.response import Response
 from rest_framework import status
 from auth_app.models import RefreshToken
-from auth_app.serializers import UserSerializer, SignUpSerializer, LoginSerializer, ChangePasswordSerializer
+from auth_app.serializers import (
+    UserSerializer,
+    SignUpSerializer,
+    LoginSerializer,
+    ChangePasswordSerializer
+)
 from auth_app.services import AuthService
 from auth_app.permissions import IsAuthenticated, RBACPermission
 
