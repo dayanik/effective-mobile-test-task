@@ -5,7 +5,6 @@ from rest_framework.generics import (
 )
 from rest_framework.response import Response
 from rest_framework import status
-from auth_app.models import RefreshToken
 from auth_app.serializers import (
     UserSerializer,
     SignUpSerializer,
@@ -13,7 +12,7 @@ from auth_app.serializers import (
     ChangePasswordSerializer
 )
 from auth_app.services import AuthService
-from auth_app.permissions import IsAuthenticated, RBACPermission
+from auth_app.permissions import IsAuthenticated
 
 
 class SignUpView(CreateAPIView):
@@ -47,8 +46,7 @@ class LogoutView(APIView):
 
 
 class PasswordChangeView(APIView):
-    permission_classes = [IsAuthenticated, RBACPermission]
-    resource = ['user']
+    permission_classes = [IsAuthenticated]
     
     def post(self, request):
         serializer = ChangePasswordSerializer(data=request.data)
@@ -70,14 +68,11 @@ class PasswordChangeView(APIView):
 
 class ProfileView(RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, RBACPermission]
-    resourse = 'user'
+    permission_classes = [IsAuthenticated]
     
     def get_object(self):
         return self.request.user
     
     def delete(self, request):
-        self.request.user.is_active = False
-        self.request.user.save()
-        RefreshToken.objects.filter(user=self.request.user).delete()
+        AuthService.delete(request.user)
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -12,7 +12,7 @@ class AuthService:
     def login(email: str, password: str) -> dict:
         user = get_object_or_404(User, email=email)
 
-        if not user.is_active or not user or not user.check_password(password):
+        if not user or not user.is_active or not user.check_password(password):
             raise ValueError("Invalid credentials")
 
         tokens = AuthService._generate_tokens(user)
@@ -28,20 +28,30 @@ class AuthService:
                 token.delete()
     
     @staticmethod
+    def delete(user):
+        user.is_active = False
+        user.save()
+        AuthService.logout(user)
+    
+    @staticmethod
     def is_exist_refresh_token(user):
         return RefreshToken.objects.filter(user=user)
 
     @staticmethod
     def validate_token(token):
         try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-            if payload.get('type') == 'access':
-                if datetime.fromtimestamp(payload.get('exp'), UTC) < datetime.now(UTC):
-                    raise ValueError("Token has expired by time")
-                user = get_object_or_404(User, id=payload.get('user_id'))
-                if not user.is_active:
-                    raise ValueError("Invalid credentials")
-                return user
+            payload = jwt.decode(
+                token,
+                settings.SECRET_KEY,
+                algorithms=[settings.SIGN_TOKEN_ALGORITHM]
+            )
+
+            user = User.objects.get(id=payload.get('user_id'))
+
+            if not user.is_active:
+                raise ValueError("Invalid credentials")
+
+            return user
         except jwt.ExpiredSignatureError:
             raise ValueError("Token has expired")
         except jwt.InvalidTokenError:
