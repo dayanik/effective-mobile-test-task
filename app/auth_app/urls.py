@@ -1,5 +1,6 @@
 from auth_app import views
 from django.urls import path
+from rest_framework.routers import DefaultRouter
 
 
 urlpatterns = [
@@ -13,3 +14,14 @@ urlpatterns = [
     ),
     path('profile/', views.ProfileView.as_view(), name='profile'),
 ]
+
+router = DefaultRouter()
+
+router.register('role', views.RoleView)
+router.register('resourse', views.ResourseView)
+router.register('action', views.ActionView)
+router.register('permission', views.PermissionView)
+router.register('role_permission', views.RolePermissionView)
+router.register('user_role', views.UserRoleView)
+
+urlpatterns += router.urls

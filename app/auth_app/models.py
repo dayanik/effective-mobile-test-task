@@ -59,6 +59,7 @@ class Permission(models.Model):
 
 
 class UserRole(models.Model):
+    '''Model to represent user relations with roles'''
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE
@@ -69,6 +70,7 @@ class UserRole(models.Model):
     )
 
 class RolePermission(models.Model):
+    '''Model to represent role relations with permissions'''
     role = models.ForeignKey(
         Role,
         on_delete=models.CASCADE
