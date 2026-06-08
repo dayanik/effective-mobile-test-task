@@ -47,7 +47,7 @@ class Command(BaseCommand):
         for resource_name in (
             'user',
             'action',
-            'resource',
+            'resourse',
             'permission',
             'role',
             'user_role',
@@ -95,24 +95,24 @@ class Command(BaseCommand):
             )
 
         admin, _ = User.objects.get_or_create(
-            email='admin@example.com',
+            email='dayan@example.com',
             defaults={
-                'first_name': 'Admin',
-                'last_name': 'User',
+                'first_name': 'Dayan',
+                'last_name': 'Iskhakov',
             },
         )
 
-        admin.set_password('admin123')
+        admin.set_password('dayan123')
 
         student, _ = User.objects.get_or_create(
-            email='student@example.com',
+            email='iskhak@example.com',
             defaults={
-                'first_name': 'Student',
-                'last_name': 'User',
+                'first_name': 'Iskhak',
+                'last_name': 'Dayanov',
             },
         )
 
-        student.set_password('student123')
+        student.set_password('iskhak123')
 
         UserRole.objects.get_or_create(
             user=admin,

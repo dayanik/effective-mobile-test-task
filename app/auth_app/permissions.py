@@ -18,11 +18,3 @@ class RBACPermission(BasePermission):
                 permission__resource__name=resourse,
                 permission__action__name=action
             ).exists()
-
-
-class IsAdminRole(BasePermission):
-    def has_permission(self, request, view):
-        return UserRole.objects.filter(
-            user=request.user,
-            role__name='admin'
-        ).exists()
