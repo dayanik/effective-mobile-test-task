@@ -1,11 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from auth_app.permissions import RBACPermission
+from auth_app.permissions import RBACPermission, IsAuthenticated
 
 
 class GraduateView(APIView):
-    permission_classes = [RBACPermission]
+    permission_classes = [IsAuthenticated, RBACPermission]
     resourse = 'graduate'
 
     def get(self, request):
@@ -32,7 +32,7 @@ class GraduateView(APIView):
 
 
 class SubjectView(APIView):
-    permission_classes = [RBACPermission]
+    permission_classes = [IsAuthenticated, RBACPermission]
     resourse = 'subject'
 
     def get(self, request):
